@@ -15,6 +15,13 @@ var express = require('express'),
 
 const   BROWSERTIME_RESULT = __dirname + "/browsertime-results/";
 
+app.get('/reports', function(req, res) {
+
+    fs.readdir(BROWSERTIME_RESULT, (err, files) => {
+        res.send(files);
+    });
+});
+
 //generate new report
 app.post('/report', function (req, res) {
     var urlToReport = cleanUrl = req.query.url;
@@ -34,7 +41,6 @@ app.post('/report', function (req, res) {
             if(err)
                 console.log("error is: ", err);
             var harJson = JSON.parse(rawHar);
-            //option: {pretty: true, includeAssets: true}
             console.log("[Xray HAR file]");
             var pages = pagexray.convert(harJson, {pretty: true, includeAssets: true});
             console.log("[Pages] ", pages);
@@ -55,9 +61,11 @@ function toCleanUrl(url){
 function getLastResultXray(url){
     return new Promise(function(resolve, reject){
         var path = BROWSERTIME_RESULT + toCleanUrl(url) + "/";
+        console.log("PATH: ", path);
         fs.readdir(path, (err, files) => {
             var browserRecordRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}.*/;
             var temp = [];
+            console.log("FILES: ", files);
             files.forEach( file => {
                 console.log("each file: ", file);
                 if (browserRecordRegex.test(file)){
