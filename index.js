@@ -3,7 +3,8 @@ const   _ = require('lodash'),
         exec = require('child_process').exec,
         fs = require('fs'),
         pagexray = require('pagexray'),
-        moment = require('moment');
+        moment = require('moment'),
+        dirTree = require('directory-tree');
 
 var express = require('express'),
     app = express(),
@@ -16,10 +17,11 @@ var express = require('express'),
 const   BROWSERTIME_RESULT = __dirname + "/browsertime-results/";
 
 app.get('/reports', function(req, res) {
-
-    fs.readdir(BROWSERTIME_RESULT, (err, files) => {
-        res.send(files);
-    });
+    var tree = dirTree(BROWSERTIME_RESULT);
+    res.send(tree);
+    // fs.readdir(BROWSERTIME_RESULT, (err, files) => {
+    //     res.send(files);
+    // });
 });
 
 //generate new report
