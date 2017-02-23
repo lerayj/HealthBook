@@ -48,7 +48,7 @@ app.post('/report', function (req, res) {
 
     var snippet = "'return new Date().valueOf() > window.performance.timing.loadEventEnd + 30000'";
 
-    exec('browsertime-master/bin/browsertime.js ' + urlToReport + ' --resultDir ' + saveDir + " --pageCompleteCheck " + snippet, function(err, out, code) {
+    exec('browsertime-master/bin/browsertime.js --xvfb ' + urlToReport + ' --resultDir ' + saveDir + " --pageCompleteCheck " + snippet, function(err, out, code) {
         if (err)
             console.log("Error:", err);   
         var harPath = __dirname + "/" + saveDir + "/browsertime.har";
