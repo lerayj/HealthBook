@@ -55,10 +55,13 @@ module.exports = {
           entry.response.headersSize = calculateResponseHeaderSize(response);
         }
 
-        entry.cache.beforeRequest = {
-          lastAccess: '',
-          eTag: '',
-          hitCount: 0
+        // h2 push might cause resource to be received before parser sees and requests it.
+        if (!(response.pushStart > 0)) {
+          entry.cache.beforeRequest = {
+            lastAccess: '',
+            eTag: '',
+            hitCount: 0
+          }
         }
 
       } else {
@@ -470,7 +473,14 @@ module.exports = {
           break;
         case 'Network.resourceChangedPriority': {
             let entry = entries.find((entry) => entry._requestId === params.requestId);
+
+            if(!entry) {
+              log.debug('Recieved resourceChangedPriority for requestId ' + params.requestId + ' with no matching request.');
+              continue;
+            }
+
             entry.request._priority = message.params.newPriority;
+
           }
           break;
 

@@ -2,6 +2,9 @@
 
 let path = require('path'),
   firefox = require('selenium-webdriver/firefox'),
+  log = require('intel'),
+  util = require('../../support/util'),
+  get = require('lodash.get'),
   geckodriver = require('soprano-saxophone').geckodriver;
 
 const defaultFirefoxPreferences = {
@@ -193,6 +196,7 @@ const defaultFirefoxPreferences = {
     // ("toolkit.telemetry.server", Pref::new("https://%(server)s/dummy/telemetry/")),
 }
 module.exports.configureBuilder = function(builder, options) {
+  const firefoxConfig = options.firefox || {};
   const moduleRootPath = path.resolve(__dirname, '..', '..', '..');
 
   const profileTemplatePath = path.resolve(moduleRootPath, 'browsersupport', 'firefox-profile'),
@@ -225,8 +229,7 @@ module.exports.configureBuilder = function(builder, options) {
   profile.setPreference('extensions.netmonitor.har.enableAutomation', true);
   profile.setPreference('extensions.netmonitor.har.contentAPIToken', 'test');
   profile.setPreference('extensions.netmonitor.har.autoConnect', true);
-  profile.setPreference('devtools.netmonitor.har.includeResponseBodies', false);
-
+  profile.setPreference('devtools.netmonitor.har.includeResponseBodies', get(options, 'firefox.includeResponseBodies', false));
   profile.setPreference('xpinstall.signatures.required', false);
   // Download from the version page, the default URL shows wrong latest version
   // https://addons.mozilla.org/sv-se/firefox/addon/har-export-trigger/versions/?page=1#version-0.5.0-beta.10
@@ -234,7 +237,15 @@ module.exports.configureBuilder = function(builder, options) {
 
   profile.setPreference('devtools.chrome.enabled', true);
 
-  const firefoxConfig = options.firefox || {};
+  const userPrefs = util.toArray(firefoxConfig.preference);
+  for (const pref of userPrefs) {
+      const nameAndValue = pref.split(':');
+      if (nameAndValue.length === 2) {
+          profile.setPreference(nameAndValue[0], nameAndValue[1]);
+      } else {
+          log.error('Firefox preferences %s need to of the format key:value, preference was not set', pref)
+      }
+  }
 
   let ffOptions = new firefox.Options();
   const binary = new firefox.Binary(firefoxConfig.binaryPath);

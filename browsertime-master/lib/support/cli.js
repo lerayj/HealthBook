@@ -81,7 +81,8 @@ module.exports.parseCommandLine = function parseCommandLine() {
       group: 'timeouts'
     })
     .option('chrome.args', {
-      describe: 'Extra command line args to pass to the chrome process (e.g. --no-sandbox)',
+      describe: 'Extra command line arguments to pass to the Chrome process (e.g. --no-sandbox). ' +
+      'To add multiple arguments to Chrome, repeat --chrome.args once per argument.',
       group: 'chrome'
     })
     .option('chrome.binaryPath', {
@@ -120,6 +121,16 @@ module.exports.parseCommandLine = function parseCommandLine() {
       describe: 'Path to custom Firefox binary (e.g. Firefox Nightly). ' +
         'On OS X, the path should be to the binary inside the app bundle, ' +
         'e.g. /Applications/Firefox.app/Contents/MacOS/firefox-bin',
+      group: 'firefox'
+    })
+    .option('firefox.preference', {
+      describe: 'Extra command line arguments to pass Firefox preferences by the format key:value ' +
+      'To add multiple preferences, repeat --firefox.preference once per argument.',
+       group: 'firefox'
+    })
+    .option('firefox.includeResponseBodies', {
+      describe: 'Include response bodies in HAR',
+      type: 'boolean',
       group: 'firefox'
     })
     .option('selenium.url', {

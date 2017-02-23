@@ -8,9 +8,22 @@ const   _ = require('lodash'),
 
 var express = require('express'),
     app = express(),
-    cors = require('cors');    
+    cors = require('cors'),
+    gcloud = require('google-cloud');
 
     app.use(cors());
+
+
+// var gcs = gcloud.storage({
+//   projectId: 'grape-spaceship-123',
+//   keyFilename: './private/healthbook-5b63e-firebase-adminsdk-w1for-e7c7edbaa5.json'
+// });
+
+// // Reference an existing bucket.
+// var bucket = gcs.bucket('healthbook-5b63e.appspot.com');
+
+// Upload a local file to a new file to be created in your bucket.
+
 //TODO: browsertime --pageCompleteCheck, mettre un set Timeout pour attendre 30 sec
 //TODO: set pretty et includeAssets sur pageXray
 
@@ -46,11 +59,24 @@ app.post('/report', function (req, res) {
             console.log("[Xray HAR file]");
             var pages = pagexray.convert(harJson, {pretty: true, includeAssets: true});
             console.log("[Pages] ", pages);
+
+
+            // bucket.upload('./browsertime-master/circle.yml', {destination:"toto/tutu"},function(err, file) {
+            //   if (!err)
+            //     console.log("Uploaded")
+            //   else
+            //     console.log("Error: ", err);
+            // });
+
             fs.writeFile(__dirname + "/" + saveDir + "/browsertime.xray.json", JSON.stringify(pages), (err) => {
                 if(err)
                     console.log("error: ", err);
                 console.log("[Saved] - " + __dirname + "/" + saveDir + "/browsertime.xray.json")
             })
+
+
+
+            
             res.send(pages);
         });
     });
