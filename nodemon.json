@@ -1,3 +1,0 @@
-{
-    "ignore": ["browsertime-results/*", "browsertime-master/*"]
-}
